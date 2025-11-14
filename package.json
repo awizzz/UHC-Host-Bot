@@ -1,0 +1,32 @@
+{
+  "name": "uhc-hosts",
+  "version": "1.1.2",
+  "description": "UHC HOSTS - Discord bot by Awizz for UHC games",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "register": "node src/registerCommands.js",
+    "lint": "eslint \"src/**/*.js\"",
+    "test": "node tests/runTests.js"
+  },
+  "author": "Awizz",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "dependencies": {
+    "@discordjs/rest": "^2.3.0",
+    "better-sqlite3": "^9.0.0",
+    "discord-api-types": "^0.37.83",
+    "discord.js": "^14.16.3",
+    "dotenv": "^16.4.5",
+    "luxon": "^3.5.0",
+    "nanoid": "^4.0.2",
+    "node-schedule": "^2.1.1"
+  },
+  "devDependencies": {
+    "eslint": "^9.9.0"
+  }
+}
+
