@@ -1,6 +1,6 @@
 # UHC HOSTS — bot Discord par Awizz
 
-UHC HOSTS est un bot Discord en Node.js (ES Modules) qui permet de fairedes annonces de hosts avec inscriptions, tirages au sort et rappels programmés. Le bot repose sur `discord.js` v14, SQLite pour la persistance, Luxon pour la gestion des dates et `node-schedule` pour la planification.
+UHC HOSTS est un bot Discord en Node.js (ES Modules) qui permet de faire des annonces de hosts avec inscriptions, tirages au sort et rappels programmés. Le bot repose sur `discord.js` v14, SQLite pour la persistance, Luxon pour la gestion des dates et `node-schedule` pour la planification.
 
 ## 🚀 Fonctionnalités principales
 - Publication d'annonce avec embed, boutons (✅/❌/📋/🎲) et option de ping `@everyone`.
