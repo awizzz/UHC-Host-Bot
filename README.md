@@ -40,5 +40,5 @@ Toutes les programmations sont restaurées au redémarrage.
 
 ---
 
-Made with ❤️ par **Awizz**. Contributions et suggestions bienvenues !
+Made with ❤️ par **Awizz**.
 
