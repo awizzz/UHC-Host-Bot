@@ -7,7 +7,7 @@ function getMinecraftHeadUrl(minecraftPseudo, size = 32) {
     return null;
   }
   const safePseudo = encodeURIComponent(minecraftPseudo);
-  // afficher la tête Minecraft du pseudo
+  // Utilisation de Minotar pour afficher la tête Minecraft du pseudo
   return `https://minotar.net/helm/${safePseudo}/${size}.png`;
 }
 
@@ -54,7 +54,7 @@ export function buildEventEmbed(event, participants = []) {
                     ? ` [${participant.minecraft_pseudo}]`
                     : '';
                   const headUrl = getMinecraftHeadUrl(participant.minecraft_pseudo);
-                  const headLink = headUrl ? ` ([🧱](${headUrl}))` : '';
+                  const headLink = headUrl ? ` ([tête](${headUrl}))` : '';
                   const admittedIcon = participant.admitted ? '✅' : '';
                   return `${baseIndex} <@${participant.user_id}>${minecraftPseudoLabel}${headLink} ${admittedIcon}`;
                 })
@@ -86,28 +86,38 @@ export function buildEventEmbed(event, participants = []) {
 
 export function buildParticipantListEmbed(event, participants) {
   const locale = (event.locale || config.defaultLocale).toLowerCase();
-  return new EmbedBuilder()
+  const description =
+    participants.length
+      ? participants
+          .map((participant, index) => {
+            const baseIndex = `\`${String(index + 1).padStart(2, '0')}\``;
+            const minecraftPseudoLabel = participant.minecraft_pseudo
+              ? ` [${participant.minecraft_pseudo}]`
+              : '';
+            const headUrl = getMinecraftHeadUrl(participant.minecraft_pseudo);
+            const headLink = headUrl ? ` ([tête](${headUrl}))` : '';
+            const admittedIcon = participant.admitted ? '✅' : '';
+            return `${baseIndex} <@${participant.user_id}>${minecraftPseudoLabel}${headLink} ${admittedIcon}`;
+          })
+          .join('\n')
+      : locale.startsWith('fr')
+        ? 'Aucun participant pour le moment.'
+        : 'No participants yet.';
+
+  const embed = new EmbedBuilder()
     .setColor(BRAND_COLOR)
     .setTitle(locale.startsWith('fr') ? `Participants • ${event.title}` : `Participants • ${event.title}`)
-    .setDescription(
-      participants.length
-        ? participants
-            .map((participant, index) => {
-              const baseIndex = `\`${String(index + 1).padStart(2, '0')}\``;
-              const minecraftPseudoLabel = participant.minecraft_pseudo
-                ? ` [${participant.minecraft_pseudo}]`
-                : '';
-              const headUrl = getMinecraftHeadUrl(participant.minecraft_pseudo);
-              const headLink = headUrl ? ` ([🧱](${headUrl}))` : '';
-              const admittedIcon = participant.admitted ? '✅' : '';
-              return `${baseIndex} <@${participant.user_id}>${minecraftPseudoLabel}${headLink} ${admittedIcon}`;
-            })
-            .join('\n')
-        : locale.startsWith('fr')
-          ? 'Aucun participant pour le moment.'
-          : 'No participants yet.',
-    )
+    .setDescription(description)
     .setFooter({ text: `ID: ${event.id}` });
+
+  // Afficher visuellement au moins une tête (premier participant avec pseudo)
+  const firstWithPseudo = participants.find((p) => p.minecraft_pseudo);
+  const thumbUrl = firstWithPseudo ? getMinecraftHeadUrl(firstWithPseudo.minecraft_pseudo, 64) : null;
+  if (thumbUrl) {
+    embed.setThumbnail(thumbUrl);
+  }
+
+  return embed;
 }
 
 export function buildDrawEmbed({ event, winners, authorTag }) {
@@ -124,7 +134,7 @@ export function buildDrawEmbed({ event, winners, authorTag }) {
             ? ` [${winner.minecraft_pseudo}]`
             : '';
           const headUrl = getMinecraftHeadUrl(winner.minecraft_pseudo, 64);
-          const headLink = headUrl ? ` ([🧱](${headUrl}))` : '';
+          const headLink = headUrl ? ` ([tête](${headUrl}))` : '';
           return `**${index + 1}.** <@${winner.user_id}>${minecraftPseudoLabel}${headLink}`;
         })
         .join('\n')
@@ -132,7 +142,7 @@ export function buildDrawEmbed({ event, winners, authorTag }) {
       ? 'Personne ne remporte ce tirage.'
       : 'No winners for this draw.';
 
-  return new EmbedBuilder()
+  const embed = new EmbedBuilder()
     .setColor(0x5865f2)
     .setTitle(title)
     .setDescription(description)
@@ -142,5 +152,16 @@ export function buildDrawEmbed({ event, winners, authorTag }) {
         : `Draw executed by ${authorTag}`,
     })
     .setTimestamp(new Date());
+
+  // Afficher la tête du premier gagnant avec pseudo comme image principale
+  const firstWinnerWithPseudo = winners.find((w) => w.minecraft_pseudo);
+  const winnerThumb = firstWinnerWithPseudo
+    ? getMinecraftHeadUrl(firstWinnerWithPseudo.minecraft_pseudo, 128)
+    : null;
+  if (winnerThumb) {
+    embed.setThumbnail(winnerThumb);
+  }
+
+  return embed;
 }
 
