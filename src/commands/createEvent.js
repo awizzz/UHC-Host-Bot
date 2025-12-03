@@ -35,8 +35,8 @@ export const data = new SlashCommandBuilder()
   .addStringOption((option) =>
     option
       .setName('link')
-      .setDescription('Lien vers les informations supplémentaires')
-      .setRequired(true),
+      .setDescription('Lien vers les informations supplémentaires (optionnel)')
+      .setRequired(false),
   )
   .addStringOption((option) =>
     option
@@ -84,7 +84,7 @@ export async function execute(interaction) {
     const slots = interaction.options.getInteger('slots', true);
     const dateInput = interaction.options.getString('date', true);
     const timeInput = interaction.options.getString('time', true);
-    const link = interaction.options.getString('link', true);
+    const link = interaction.options.getString('link');
     const description = interaction.options.getString('description', true);
     const guildConfig = getGuildConfig(interaction.guildId);
     const reminderMinutes =
@@ -113,7 +113,7 @@ export async function execute(interaction) {
       );
     }
 
-    if (!/^https?:\/\//i.test(link)) {
+    if (link && !/^https?:\/\//i.test(link)) {
       throw new Error('Le lien doit commencer par http:// ou https://');
     }
 
@@ -121,7 +121,7 @@ export async function execute(interaction) {
       title,
       slots,
       startsAt: parsedDate,
-      link,
+      link: link ?? null,
       description,
       admissionOffset,
       reminderMinutes,
