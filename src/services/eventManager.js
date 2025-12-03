@@ -87,7 +87,7 @@ export function createEventManager({ client }) {
       admission_opens_at: admissionOpensAt.toISO(),
       admission_open: admissionsAreOpen ? 1 : 0,
       reminder_minutes: reminderValue,
-      link: options.link,
+      link: options.link ?? '',
       creator_id: interaction.user.id,
       creator_tag: interaction.user.tag ?? interaction.user.username,
       channel_id: interaction.channelId,
