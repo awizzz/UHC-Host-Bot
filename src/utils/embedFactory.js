@@ -53,10 +53,8 @@ export function buildEventEmbed(event, participants = []) {
                   const minecraftPseudoLabel = participant.minecraft_pseudo
                     ? ` [${participant.minecraft_pseudo}]`
                     : '';
-                  const headUrl = getMinecraftHeadUrl(participant.minecraft_pseudo);
-                  const headLink = headUrl ? ` ([tête](${headUrl}))` : '';
                   const admittedIcon = participant.admitted ? '✅' : '';
-                  return `${baseIndex} <@${participant.user_id}>${minecraftPseudoLabel}${headLink} ${admittedIcon}`;
+                  return `${baseIndex} <@${participant.user_id}>${minecraftPseudoLabel} ${admittedIcon}`;
                 })
                 .join('\n')
             : locale.startsWith('fr')
@@ -94,10 +92,8 @@ export function buildParticipantListEmbed(event, participants) {
             const minecraftPseudoLabel = participant.minecraft_pseudo
               ? ` [${participant.minecraft_pseudo}]`
               : '';
-            const headUrl = getMinecraftHeadUrl(participant.minecraft_pseudo);
-            const headLink = headUrl ? ` ([tête](${headUrl}))` : '';
             const admittedIcon = participant.admitted ? '✅' : '';
-            return `${baseIndex} <@${participant.user_id}>${minecraftPseudoLabel}${headLink} ${admittedIcon}`;
+            return `${baseIndex} <@${participant.user_id}>${minecraftPseudoLabel} ${admittedIcon}`;
           })
           .join('\n')
       : locale.startsWith('fr')
@@ -133,9 +129,7 @@ export function buildDrawEmbed({ event, winners, authorTag }) {
           const minecraftPseudoLabel = winner.minecraft_pseudo
             ? ` [${winner.minecraft_pseudo}]`
             : '';
-          const headUrl = getMinecraftHeadUrl(winner.minecraft_pseudo, 64);
-          const headLink = headUrl ? ` ([tête](${headUrl}))` : '';
-          return `**${index + 1}.** <@${winner.user_id}>${minecraftPseudoLabel}${headLink}`;
+          return `**${index + 1}.** <@${winner.user_id}>${minecraftPseudoLabel}`;
         })
         .join('\n')
     : locale.startsWith('fr')
@@ -152,15 +146,6 @@ export function buildDrawEmbed({ event, winners, authorTag }) {
         : `Draw executed by ${authorTag}`,
     })
     .setTimestamp(new Date());
-
-  // Afficher la tête du premier gagnant avec pseudo comme image principale
-  const firstWinnerWithPseudo = winners.find((w) => w.minecraft_pseudo);
-  const winnerThumb = firstWinnerWithPseudo
-    ? getMinecraftHeadUrl(firstWinnerWithPseudo.minecraft_pseudo, 128)
-    : null;
-  if (winnerThumb) {
-    embed.setThumbnail(winnerThumb);
-  }
 
   return embed;
 }
