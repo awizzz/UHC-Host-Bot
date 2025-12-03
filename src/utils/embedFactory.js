@@ -2,15 +2,6 @@ import { EmbedBuilder } from 'discord.js';
 import { config } from '../config.js';
 import { formatAbsolute, formatRelative, toUnixSeconds, describeAdmission } from './time.js';
 
-function getMinecraftHeadUrl(minecraftPseudo, size = 32) {
-  if (!minecraftPseudo) {
-    return null;
-  }
-  const safePseudo = encodeURIComponent(minecraftPseudo);
-  // Utilisation de Minotar pour afficher la tête Minecraft du pseudo
-  return `https://minotar.net/helm/${safePseudo}/${size}.png`;
-}
-
 const BRAND_COLOR = 0xff914d;
 
 export function buildEventEmbed(event, participants = []) {
@@ -107,20 +98,11 @@ export function buildParticipantListEmbed(event, participants) {
         ? 'Aucun participant pour le moment.'
         : 'No participants yet.';
 
-  const embed = new EmbedBuilder()
+  return new EmbedBuilder()
     .setColor(BRAND_COLOR)
     .setTitle(locale.startsWith('fr') ? `Participants • ${event.title}` : `Participants • ${event.title}`)
     .setDescription(description)
     .setFooter({ text: `ID: ${event.id}` });
-
-  // Afficher visuellement au moins une tête (premier participant avec pseudo)
-  const firstWithPseudo = participants.find((p) => p.minecraft_pseudo);
-  const thumbUrl = firstWithPseudo ? getMinecraftHeadUrl(firstWithPseudo.minecraft_pseudo, 64) : null;
-  if (thumbUrl) {
-    embed.setThumbnail(thumbUrl);
-  }
-
-  return embed;
 }
 
 export function buildDrawEmbed({ event, winners, authorTag }) {
