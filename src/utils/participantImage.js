@@ -1,5 +1,3 @@
-import { createCanvas, loadImage } from 'canvas';
-
 const CANVAS_WIDTH = 800;
 const ROW_HEIGHT = 40;
 const AVATAR_SIZE = 32;
@@ -7,6 +5,15 @@ const PADDING_X = 16;
 const PADDING_Y = 16;
 const TEXT_MARGIN_X = 12;
 const MAX_ROWS = 25;
+
+let canvasModulePromise = null;
+
+async function loadCanvasModule() {
+  if (!canvasModulePromise) {
+    canvasModulePromise = import('canvas').catch(() => null);
+  }
+  return canvasModulePromise;
+}
 
 function getMinecraftHeadUrl(minecraftPseudo, size = AVATAR_SIZE) {
   if (!minecraftPseudo) {
@@ -23,6 +30,12 @@ async function drawListImage(rows) {
   }
 
   const height = PADDING_Y * 2 + rowCount * ROW_HEIGHT;
+
+  const canvasModule = await loadCanvasModule();
+  if (!canvasModule) {
+    return null;
+  }
+  const { createCanvas, loadImage } = canvasModule;
   const canvas = createCanvas(CANVAS_WIDTH, height);
   const ctx = canvas.getContext('2d');
 
@@ -122,3 +135,5 @@ export async function createWinnersImageAttachment(event, winners) {
 
   return { attachment: buffer, name };
 }
+
+
