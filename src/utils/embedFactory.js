@@ -2,6 +2,15 @@ import { EmbedBuilder } from 'discord.js';
 import { config } from '../config.js';
 import { formatAbsolute, formatRelative, toUnixSeconds, describeAdmission } from './time.js';
 
+function getMinecraftHeadUrl(minecraftPseudo, size = 32) {
+  if (!minecraftPseudo) {
+    return null;
+  }
+  const safePseudo = encodeURIComponent(minecraftPseudo);
+  // afficher la tête Minecraft du pseudo
+  return `https://minotar.net/helm/${safePseudo}/${size}.png`;
+}
+
 const BRAND_COLOR = 0xff914d;
 
 export function buildEventEmbed(event, participants = []) {
@@ -39,16 +48,16 @@ export function buildEventEmbed(event, participants = []) {
           participantsCount > 0
             ? participants
                 .slice(0, 12)
-                .map(
-                  (participant, index) => {
-                    const minecraftPseudo = participant.minecraft_pseudo
-                      ? ` [${participant.minecraft_pseudo}]`
-                      : '';
-                    return `\`${String(index + 1).padStart(2, '0')}\` <@${participant.user_id}>${minecraftPseudo} ${
-                      participant.admitted ? '✅' : ''
-                    }`;
-                  },
-                )
+                .map((participant, index) => {
+                  const baseIndex = `\`${String(index + 1).padStart(2, '0')}\``;
+                  const minecraftPseudoLabel = participant.minecraft_pseudo
+                    ? ` [${participant.minecraft_pseudo}]`
+                    : '';
+                  const headUrl = getMinecraftHeadUrl(participant.minecraft_pseudo);
+                  const headLink = headUrl ? ` ([🧱](${headUrl}))` : '';
+                  const admittedIcon = participant.admitted ? '✅' : '';
+                  return `${baseIndex} <@${participant.user_id}>${minecraftPseudoLabel}${headLink} ${admittedIcon}`;
+                })
                 .join('\n')
             : locale.startsWith('fr')
               ? 'Aucun participant pour le moment.'
@@ -83,16 +92,16 @@ export function buildParticipantListEmbed(event, participants) {
     .setDescription(
       participants.length
         ? participants
-            .map(
-              (participant, index) => {
-                const minecraftPseudo = participant.minecraft_pseudo
-                  ? ` [${participant.minecraft_pseudo}]`
-                  : '';
-                return `\`${String(index + 1).padStart(2, '0')}\` <@${participant.user_id}>${minecraftPseudo} ${
-                  participant.admitted ? '✅' : ''
-                }`;
-              },
-            )
+            .map((participant, index) => {
+              const baseIndex = `\`${String(index + 1).padStart(2, '0')}\``;
+              const minecraftPseudoLabel = participant.minecraft_pseudo
+                ? ` [${participant.minecraft_pseudo}]`
+                : '';
+              const headUrl = getMinecraftHeadUrl(participant.minecraft_pseudo);
+              const headLink = headUrl ? ` ([🧱](${headUrl}))` : '';
+              const admittedIcon = participant.admitted ? '✅' : '';
+              return `${baseIndex} <@${participant.user_id}>${minecraftPseudoLabel}${headLink} ${admittedIcon}`;
+            })
             .join('\n')
         : locale.startsWith('fr')
           ? 'Aucun participant pour le moment.'
@@ -111,10 +120,12 @@ export function buildDrawEmbed({ event, winners, authorTag }) {
   const description = winners.length
     ? winners
         .map((winner, index) => {
-          const minecraftPseudo = winner.minecraft_pseudo
+          const minecraftPseudoLabel = winner.minecraft_pseudo
             ? ` [${winner.minecraft_pseudo}]`
             : '';
-          return `**${index + 1}.** <@${winner.user_id}>${minecraftPseudo}`;
+          const headUrl = getMinecraftHeadUrl(winner.minecraft_pseudo, 64);
+          const headLink = headUrl ? ` ([🧱](${headUrl}))` : '';
+          return `**${index + 1}.** <@${winner.user_id}>${minecraftPseudoLabel}${headLink}`;
         })
         .join('\n')
     : locale.startsWith('fr')
