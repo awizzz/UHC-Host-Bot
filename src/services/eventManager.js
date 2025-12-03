@@ -208,6 +208,15 @@ export function createEventManager({ client }) {
       );
     }
 
+    const minecraftProfile = database.getMinecraftPseudo(interaction.user.id);
+    if (!minecraftProfile?.minecraft_pseudo) {
+      throw new Error(
+        config.defaultLocale.startsWith('fr')
+          ? 'Vous devez d\'abord enregistrer votre pseudo Minecraft avec la commande `/pseudo`.'
+          : 'You must first register your Minecraft username using the `/pseudo` command.',
+      );
+    }
+
     const currentParticipants = database.getParticipants(eventId);
     if (currentParticipants.length >= event.slots) {
       throw new Error(
