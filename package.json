@@ -1,6 +1,6 @@
 {
   "name": "uhc-hosts",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "description": "UHC HOSTS - Discord bot by Awizz for UHC games",
   "type": "module",
   "main": "src/index.js",
@@ -16,6 +16,7 @@
     "node": ">=18.17.0"
   },
   "dependencies": {
+    "canvas": "^2.11.2",
     "@discordjs/rest": "^2.3.0",
     "better-sqlite3": "^9.0.0",
     "discord-api-types": "^0.37.83",
