@@ -30,12 +30,13 @@ export async function execute(interaction) {
     .setTitle('📅 Prochains événements')
     .setDescription(
       events
-        .map(
-          (event) =>
-            `• \`${event.id}\` — **${event.title}**\n<${event.link}>\n<t:${Math.floor(
-              new Date(event.starts_at).getTime() / 1000,
-            )}:F> (${formatRelative(event.starts_at)})`,
-        )
+        .map((event) => {
+          const hasLink = typeof event.link === 'string' && event.link.trim().length > 0;
+          const linkLine = hasLink ? `<${event.link}>` : 'Aucun document';
+          return `• \`${event.id}\` — **${event.title}**\n${linkLine}\n<t:${Math.floor(
+            new Date(event.starts_at).getTime() / 1000,
+          )}:F> (${formatRelative(event.starts_at)})`;
+        })
         .join('\n\n'),
     );
 
