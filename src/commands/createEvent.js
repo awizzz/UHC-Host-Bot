@@ -34,15 +34,15 @@ export const data = new SlashCommandBuilder()
   )
   .addStringOption((option) =>
     option
-      .setName('link')
-      .setDescription('Lien vers les informations supplémentaires (optionnel)')
-      .setRequired(false),
-  )
-  .addStringOption((option) =>
-    option
       .setName('description')
       .setDescription('Description courte à afficher')
       .setRequired(true),
+  )
+  .addStringOption((option) =>
+  option
+      .setName('link')
+      .setDescription('Lien vers les informations supplémentaires (optionnel)')
+      .setRequired(false),
   )
   .addIntegerOption((option) =>
     option
