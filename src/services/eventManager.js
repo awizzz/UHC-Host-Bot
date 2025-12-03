@@ -46,11 +46,26 @@ export function createEventManager({ client }) {
     const locale = guildConfig.locale || config.defaultLocale;
     const timezone = guildConfig.timezone || config.defaultTimezone;
     const startDate = ensureFuture(options.startsAt ?? options.date, timezone);
+
+    const fallbackAdmissionOffset =
+      typeof guildConfig.admissionOffset === 'number'
+        ? guildConfig.admissionOffset
+        : config.defaultAdmissionOffset ?? 0;
     const admissionValue = Number.isFinite(admissionOffset)
       ? Math.max(admissionOffset, 0)
-      : Math.max(guildConfig.admissionOffset ?? 0, 0);
-    const admissionOpensAt = computeAdmissionTime(startDate, admissionValue);
-    const admissionsAreOpen = admissionOpensAt <= ensureDateTime(new Date(), timezone);
+      : Math.max(fallbackAdmissionOffset, 0);
+
+    let admissionOpensAt;
+    let admissionsAreOpen;
+    if (admissionValue === 0) {
+      // 0 => admissions immédiates
+      const now = ensureDateTime(new Date(), timezone);
+      admissionOpensAt = now;
+      admissionsAreOpen = true;
+    } else {
+      admissionOpensAt = computeAdmissionTime(startDate, admissionValue);
+      admissionsAreOpen = admissionOpensAt <= ensureDateTime(new Date(), timezone);
+    }
     const reminderValue = Number.isFinite(reminderMinutes)
       ? reminderMinutes
       : guildConfig.reminderMinutes ?? config.defaultReminderMinutes;
@@ -480,12 +495,22 @@ export function createEventManager({ client }) {
     }
 
     if (typeof changes.admission_offset !== 'undefined') {
-      const offset = Math.max(Number.parseInt(changes.admission_offset, 10) || 0, 0);
+      const parsed = Number.parseInt(changes.admission_offset, 10);
+      const offset = Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
       updatedFields.admission_offset = offset;
+
       const start = ensureDateTime(updatedFields.starts_at ?? event.starts_at, event.timezone);
-      updatedFields.admission_opens_at = computeAdmissionTime(start, offset).toISO();
-      updatedFields.admission_open =
-        computeAdmissionTime(start, offset) <= ensureDateTime(new Date(), event.timezone) ? 1 : 0;
+      if (offset === 0) {
+        // 0 => ouvrir les admissions immédiatement
+        const now = ensureDateTime(new Date(), event.timezone);
+        updatedFields.admission_opens_at = now.toISO();
+        updatedFields.admission_open = 1;
+      } else {
+        const admissionDate = computeAdmissionTime(start, offset);
+        updatedFields.admission_opens_at = admissionDate.toISO();
+        updatedFields.admission_open =
+          admissionDate <= ensureDateTime(new Date(), event.timezone) ? 1 : 0;
+      }
     }
 
     const updatedEvent = database.updateEvent(eventId, updatedFields);
