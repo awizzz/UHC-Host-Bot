@@ -38,8 +38,19 @@ export async function handleButton(interaction) {
         break;
       }
       case 'list': {
-        const embed = await manager.showParticipants(eventId);
-        await interaction.reply({ embeds: [embed], ephemeral: true });
+        const result = await manager.showParticipants(eventId);
+        if (result.file) {
+          await interaction.reply({
+            embeds: [result.embed],
+            files: [result.file],
+            ephemeral: true,
+          });
+        } else {
+          await interaction.reply({
+            embeds: [result.embed],
+            ephemeral: true,
+          });
+        }
         break;
       }
       case 'lottery': {
