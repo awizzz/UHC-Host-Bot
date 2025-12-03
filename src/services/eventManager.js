@@ -14,6 +14,7 @@ import {
   buildEventEmbed,
   buildParticipantListEmbed,
 } from '../utils/embedFactory.js';
+import { createParticipantsImageAttachment, createWinnersImageAttachment } from '../utils/participantImage.js';
 import {
   computeAdmissionTime,
   ensureDateTime,
@@ -313,7 +314,19 @@ export function createEventManager({ client }) {
       throw new Error('Event not found.');
     }
     const participants = database.getParticipants(eventId);
-    return buildParticipantListEmbed(event, participants);
+    const embed = buildParticipantListEmbed(event, participants);
+
+    let file = null;
+    try {
+      file = await createParticipantsImageAttachment(event, participants);
+      if (file) {
+        embed.setImage(`attachment://${file.name}`);
+      }
+    } catch {
+      // En cas d'erreur, on se contente de l'embed texte
+    }
+
+    return { embed, file };
   }
 
   async function runDraw(interaction, eventId, winnersCount, options = {}) {
@@ -361,7 +374,19 @@ export function createEventManager({ client }) {
         winners,
         authorTag: interaction?.user?.tag ?? options.trigger ?? 'System',
       });
-      await channel.send({ embeds: [embed] });
+
+      const files = [];
+      try {
+        const file = await createWinnersImageAttachment(event, winners);
+        if (file) {
+          embed.setImage(`attachment://${file.name}`);
+          files.push(file);
+        }
+      } catch {
+        // Ignore les erreurs de génération d'image
+      }
+
+      await channel.send({ embeds: [embed], files });
     }
 
     if (!options?.silent) {
