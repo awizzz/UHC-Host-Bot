@@ -27,6 +27,13 @@ export function buildEventEmbed(event, participants = []) {
   const linkLabel = locale.startsWith('fr') ? 'Document' : 'Document';
   const admissionLabel = locale.startsWith('fr') ? 'Admissions' : 'Admissions';
 
+  const linkValue =
+    typeof event.link === 'string' && event.link.trim().length > 0
+      ? event.link
+      : locale.startsWith('fr')
+        ? 'Aucun document fourni.'
+        : 'No document provided.';
+
   return new EmbedBuilder()
     .setColor(BRAND_COLOR)
     .setTitle(event.title)
@@ -67,7 +74,7 @@ export function buildEventEmbed(event, participants = []) {
       },
       {
         name: linkLabel,
-        value: event.link,
+        value: linkValue,
       },
       {
         name: admissionLabel,
